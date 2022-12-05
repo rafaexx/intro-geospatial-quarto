@@ -2,5 +2,6 @@
 .Rhistory
 .RData
 .Ruserdata
-
 /.quarto/
+intro.html
+/intro_files/
