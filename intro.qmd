@@ -4,6 +4,9 @@ subtitle: "...actually, with R but powered by Quarto"
 author: "Rafael Camargo"
 date: "December 6, 2022"
 engine: knitr
+format:
+  html:
+    toc: true
 ---
 
 ## Why R or Quarto ?

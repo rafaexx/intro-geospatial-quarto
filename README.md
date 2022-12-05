@@ -1,5 +1,6 @@
 # Intro to Geospatial with R
-…actually, with R but powered by Quarto
+
+...actually, with R but powered by Quarto
 
 ## Why R or Quarto ?
 
@@ -17,8 +18,10 @@
 
 -   Quarto is where you bring R, Python, and even Jupyter notebooks all together.
 
--   Quarto makes reproducible analysis easy, e.g. enables you to weave together content and executable code into a finished document ([like this page](https://rafaelatwwf.github.io/intro-geospatial-quarto/), or a presentation, or pdf, or even a [Shiny app](https://shiny.rstudio.com))
- 
+-   Quarto makes reproducible analysis easy, e.g. enables you to weave together content and executable code into a finished document (as a html, or a presentation, or pdf, or even a [Shiny app](https://shiny.rstudio.com))
+
+
+
 
 ## Objective for this session
 
@@ -29,7 +32,9 @@
 -   Show you some basic codes and some spatial stuff that R does nicely
 
 -   Show you how to find the help you need
- 
+
+
+
 
 ## Let's get started
 

@@ -1,7 +1,5 @@
 project:
   title: "intro-geospatial-quarto"
-  type: website
-  output-dir: docs
 
 editor: visual
 
