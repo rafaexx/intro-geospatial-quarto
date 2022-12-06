@@ -31,6 +31,8 @@ paste0(my_gis_lib, "Wetlands/TROP-SUBTROP_WetlandV3b_2016_CIFOR.tif")
 
 This time you can download all the play data for this exercise [here](https://drive.google.com/file/d/1-yfH-WoiBJjhSDcJnvIzbT8I6QsYxnn6/view?usp=sharing)
 
+ 
+
 ## Load different data formats into spatial objects
 
 From csv
@@ -77,6 +79,8 @@ From [Natural Earth](https://cran.r-project.org/web/packages/rnaturalearth/vigne
 countries <- rnaturalearth::ne_countries(scale = "medium", returnclass = "sf")
 ```
 
+ 
+
 ## Skim quickly through your data
 
 Plot all variables
@@ -109,6 +113,8 @@ Skim
 skimr::skim(cities)
 ```
 
+ 
+
 ## Manipulate data's attribute table
 
 The [sf](https://r-spatial.github.io/sf/) package as well as the [dplyr, tidyrr, stringr, forcats, and glue](https://www.tidyverse.org/packages/) are your best friend here
@@ -121,6 +127,8 @@ cities2 <- cities %>%
   dplyr::select(Index, City = `Urban Agglomeration`, `Country or area`, `Country Code`, `1950`:`2030`, Latitude, Longitude) %>%
   dplyr::rename(Country = `Country or area`, Country_code = `Country Code`)
 ```
+
+ 
 
 #### Calculate and/or add fields
 
@@ -144,6 +152,8 @@ cities2 %>%
   )
 ```
 
+ 
+
 #### Manipulate multiple fields
 
 ```{r}
@@ -153,6 +163,8 @@ cities2 %>%
     dplyr::across(`1950`:`2030`, .fns = list(pop = ~ . * 1000), .names = "{.fn}_{.col}")
   )
 ```
+
+ 
 
 ## Spatial join two polygon shapefiles
 
@@ -171,11 +183,15 @@ A one-line code solution
 sf::st_join(x = portugal_adm1, y = portugal_rbd, largest = TRUE)
 ```
 
+ 
+
 ## Merge but faster
 
 ```{r}
 dplyr::bind_rows(cities2, ramsar)
 ```
+
+ 
 
 ## Rasterize but faster
 
@@ -186,6 +202,8 @@ snap_raster <- raster::raster(portugal_adm1, res = 0.001)
 fasterize::fasterize(sf = portugal_adm1, raster = snap_raster, field = "OBJECTID_1", fun = "max") %>%
   plot()
 ```
+
+ 
 
 ## Iterate your stuff
 
@@ -230,6 +248,8 @@ st_read("data/shp/avocado_top_prod.shp") %>%
   mapview::mapview()
 ```
 
+ 
+
 ## Manipulate NetCDF
 
 #### Download some data
@@ -249,6 +269,8 @@ Drought Index [SPEI](https://spei.csic.es/)
 check_before_download(destfile = "data/spei48.nc",
                       url = "https://soton.eead.csic.es/spei/10/nc/spei48.nc")
 ```
+
+ 
 
 #### Handle the data
 
