@@ -17,15 +17,15 @@ format:
 
 -   Some tasks can be done much more efficiently using one tool or the other
 
--   R is useful for much more stuff than statistical computing, e.g. for geospatial and for data science - from data mining, cleaning/wrangling, exploration, ML, to visualization
+-   R is useful for much more stuff than statistical computing, e.g., for geospatial and for data science - from data mining, cleaning/wrangling, exploration, ML, to visualization
 
 -   R was designed to handle tabular data (by the way, geospatial data is also tabular!)
 
 -   RStudio IDE is ever evolving (and it's free!), but what's an IDE ?
 
--   Quarto is where you bring R, Python, and even Jupyter notebooks all together.
+-   Quarto is where you bring R, Python, and even Jupyter notebooks all together
 
--   Quarto makes reproducible analysis easy, e.g. enables you to weave together content and executable code into a finished document (like this page, or a presentation, or pdf, or even a [Shiny app](https://shiny.rstudio.com))
+-   Quarto makes reproducible analysis easy, e.g., enables you to weave together content and executable code into a finished document (like this page, or a presentation, or pdf, or even a [Shiny app](https://shiny.rstudio.com))
 
 ```{r}
 #| code-fold: true
@@ -39,7 +39,7 @@ mapview::mapview(world, zcol = "pop_est")
 
 -   Show you how to setup your R / Quarto environment so that it's ready to go when you need it
 
--   Show you some useful packages (libraries)
+-   Show you some useful packages (i.e, libraries)
 
 -   Show you some basic codes and some spatial stuff that R does nicely
 
@@ -54,3 +54,13 @@ mapview::mapview(world, zcol = "pop_est")
 -   If you run on Win, it's good to install [RTools](https://cran.r-project.org/bin/windows/Rtools)
 
 -   Install [Quarto](https://quarto.org)
+
+-   Use Git to have version control (see [here](https://jennybc.github.io/2014-05-12-ubc/ubc-r/session03_git.html) for some quick instructions or [here](https://happygitwithr.com/index.html) for some more detail)
+
+-   Create a new Rproj
+
+-   Create a new Quarto document
+
+-   Welcome to [tidyverse](https://www.tidyverse.org/) and the %\>% (i.e., pipe operator)
+
+-   Get familiar with RStudio, e.g., Help \> Cheat Sheets as well as the Help \> Keyboard Shortcuts Help

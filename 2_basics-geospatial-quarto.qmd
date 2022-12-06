@@ -1,0 +1,284 @@
+---
+title: "Intro to Geospatial with R"
+subtitle: "...actually, with R but powered by Quarto"
+author: "Rafael Camargo"
+date: "December 6, 2022"
+engine: knitr
+format:
+  html:
+    toc: true
+execute:
+  warning: false    
+---
+
+## Setup
+
+Load required packages
+
+```{r}
+if (!require("pacman")) install.packages("pacman")
+pacman::p_load("rmarkdown", "reticulate", "tidyverse", "readxl", "sf", "stars", "rnaturalearth", "mapview", "skimr", "glue", "raster", "fasterize", "purrr")
+```
+
+Define a shortcut to a folder that you may very often need, so later you can use shorter paths to your files
+
+```{r}
+# be aware that R uses / (forward slashes)
+my_gis_lib <- "C:/Users/Rafael.Camargo/wwfgermany/FB-OuR-Daten - WRF/ws_gis/1_library/" 
+# that's an example
+paste0(my_gis_lib, "Wetlands/TROP-SUBTROP_WetlandV3b_2016_CIFOR.tif") 
+```
+
+This time you download all the play data for this exercise [here](https://drive.google.com/file/d/1-yfH-WoiBJjhSDcJnvIzbT8I6QsYxnn6/view?usp=sharing)
+
+## Load different data formats into spatial objects
+
+From csv
+
+```{r}
+ramsar <- readr::read_csv("data/ramsar_sites.csv") %>%
+  sf::st_as_sf(coords = c("Longitude","Latitude"), crs = 4326, remove = FALSE)
+```
+
+From MS Excel
+
+```{r}
+cities <- readxl::read_excel("data/cities_over300k.xls", sheet = "Data", skip = 16) %>%
+  sf::st_as_sf(coords = c("Longitude","Latitude"), crs = 4326, remove = FALSE)
+```
+
+From shapefile
+
+```{r}
+world_wrf <- sf::st_read("data/shp/WRF_GDP_country.shp")
+```
+
+From geodatabase
+
+```{r}
+portugal_rbd <- sf::st_read("data/portugal.gdb", layer = "eu_river_basin_district")
+```
+
+From geojson
+
+```{r}
+portugal_adm1 <- sf::st_read("data/portugal_adm1.geojson")
+```
+
+From raster
+
+```{r}
+ncp <- stars::read_stars("data/raster/avocado_Production.tif")
+```
+
+From [Natural Earth](https://cran.r-project.org/web/packages/rnaturalearth/vignettes/rnaturalearth.html)
+
+```{r}
+countries <- rnaturalearth::ne_countries(scale = "medium", returnclass = "sf")
+```
+
+## Skim quickly through your data
+
+Plot all variables
+
+```{r}
+plot(world_wrf)
+```
+
+Interactive map + pop-up
+
+```{r}
+mapview::mapview(world_wrf, zcol = "GDP_PPP")
+```
+
+See the data
+
+```{r}
+cities
+```
+
+See the data structure
+
+```{r}
+str(cities)
+```
+
+Skim
+
+```{r}
+skimr::skim(cities)
+```
+
+## Manipulate data's attribute table
+
+The [sf](https://r-spatial.github.io/sf/) package as well as the [dplyr, tidyrr, stringr, forcats, and glue](https://www.tidyverse.org/packages/) are your best friend here
+
+#### Select, relocate and/or rename fields
+
+```{r}
+cities2 <- cities %>%
+  dplyr::select(-c(Note, `2035`)) %>% # Use backticks if `field name has space or is numeric`
+  dplyr::select(Index, City = `Urban Agglomeration`, `Country or area`, `Country Code`, `1950`:`2030`, Latitude, Longitude) %>%
+  dplyr::rename(Country = `Country or area`, Country_code = `Country Code`)
+```
+
+#### Calculate and/or add fields
+
+`mutate` Overwrites if field exists, otherwise creates a new field
+
+```{r}
+cities2 %>%
+  dplyr::mutate( 
+    City = glue::glue("{City} ({Country})"), 
+    pop_increase = (`2030` - `1950`) / `1950`
+  )
+```
+
+`transmute` Overwrite or creates new fields, but drop all other fields
+
+```{r}
+cities2 %>%
+  dplyr::transmute( # Add new fields and drop all others
+    City = glue::glue("{City} ({Country})"),
+    pop_increase = (`2030` - `1950`) / `1950`
+  )
+```
+
+#### Manipulate multiple fields
+
+```{r}
+cities2 %>%
+  dplyr::transmute(
+    City = glue::glue("{City} ({Country})"),
+    dplyr::across(`1950`:`2030`, .fns = list(pop = ~ . * 1000), .names = "{.fn}_{.col}")
+  )
+```
+
+## Spatial join two polygon shapefiles
+
+...matching the features of largest area overlap
+
+Visualize the problem
+
+```{r}
+mapview::mapview(portugal_adm1, zcol = "NAME") +
+  mapview::mapview(portugal_rbd, color = "Black", alpha.regions = 0, lwd = 2)
+```
+
+A one-line code solution
+
+```{r}
+sf::st_join(x = portugal_adm1, y = portugal_rbd, largest = TRUE)
+```
+
+## Merge but faster
+
+```{r}
+dplyr::bind_rows(cities2, ramsar)
+```
+
+## Rasterize but faster
+
+with the [fasterize](https://cran.r-project.org/web/packages/fasterize/vignettes/using-fasterize.html) package
+
+```{r}
+snap_raster <- raster::raster(portugal_adm1, res = 0.001)
+fasterize::fasterize(sf = portugal_adm1, raster = snap_raster, field = "OBJECTID_1", fun = "max") %>%
+  plot()
+```
+
+## Iterate your stuff
+
+The [purrr](https://purrr.tidyverse.org/) package is your best friend here
+
+For example, iterate with a custom function
+
+```{r}
+get_top_producing_regions <- function(input, output){
+  # Load crop producing regions
+  crop <- stars::read_stars(paste0("data/raster/", input))
+  crop[crop == 0] <- NA
+
+  # Subset to cells of top 20% highest values
+  crop[crop < quantile(crop[[input]], probs = 0.8, na.rm = TRUE, names = FALSE)] <- NA
+  crop[crop > 0] <- 1
+
+  # Convert raster to shapefile and write to disk
+  temp <- sf::st_as_sf(crop) %>%
+    sf::st_combine() %>%
+    sf::st_write(dsn = "data/shp",  output, driver = "ESRI Shapefile", delete_layer = TRUE)
+} 
+```
+
+Create the lists of inputs and outputs
+
+```{r}
+inputs <- list("avocado_Production.tif", "banana_Production.tif", "grape_Production.tif")
+outputs <- list("avocado_top_prod.shp", "banana_top_prod.shp", "grape_top_prod.shp")
+```
+
+Iterate using `map`
+
+```{r}
+# purrr::map2(inputs, outputs, get_top_producing_regions)
+```
+
+Visualize output
+
+```{r}
+st_read("data/shp/avocado_top_prod.shp") %>%
+  mapview::mapview()
+```
+
+## Manipulate NetCDF
+
+#### Download some data
+
+Create a custom function to check if file already exists in directory. If not, then download it.
+
+```{r}
+check_before_download <- function(destfile, url){
+  if (file.exists(destfile)) {print("The file already exists")}
+  else {download.file(url = url, destfile = destfile, mode = 'wb')}
+}
+```
+
+Drought Index [SPEI](https://spei.csic.es/)
+
+```{r}
+check_before_download(destfile = "data/spei48.nc",
+                      url = "https://soton.eead.csic.es/spei/10/nc/spei48.nc")
+```
+
+#### Handle the data
+
+Load as a multi-layer raster object
+
+```{r}
+spei <- raster::brick("data/spei48.nc")
+```
+
+Get the last 10 years of monthly observations, where Z is the variable time
+
+```{r}
+spei_sliced <- spei[[which(
+  raster::getZ(spei) >= seq(Sys.Date(), length = 2, by = "-122 months")[2] & raster::getZ(spei) <= Sys.Date()
+)]]
+
+length(spei_sliced[4])
+```
+
+Compute frequency probability of severe drought events (SPEI \<= -1.5)
+
+```{r}
+below_threshold <- function(x) dplyr::if_else(x <= -1.5, 1, 0) 
+
+drought_probability <- raster::calc(spei_sliced, fun = below_threshold) %>%
+  sum() / length(spei_sliced[4])
+```
+
+Visualize
+
+```{r}
+mapview::mapview(drought_probability)
+```

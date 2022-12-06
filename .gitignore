@@ -3,5 +3,8 @@
 .RData
 .Ruserdata
 /.quarto/
-intro.html
-intro_files/
+data/*
+1_intro.html
+1_intro_files/
+2_basics-geospatial-quarto.html
+2_basics-geospatial-quarto_files/
