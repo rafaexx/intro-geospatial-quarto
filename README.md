@@ -1,4 +1,6 @@
-# Intro to Geospatial with R
+Watch the video recording [here](https://wwf.zoom.us/rec/share/bulydgm7q6ZctGup2Ije0xiLq8RK9DJWsBLAKGotLwDfElhX6bwgwAIQ0ctxljiY.GfEa6gowS50PkjRr?startTime=1670331794000)
+
+# Intro to Geospatial with R 
 
 ...actually, with R but powered by Quarto
 
@@ -20,7 +22,7 @@
 
 -   Quarto makes reproducible analysis easy, e.g., enables you to weave together content and executable code into a finished document (as a html, or a presentation, or pdf, or even a [Shiny app](https://shiny.rstudio.com))
 
-## Objective for this session
+## Objective for this tutorial
 
 -   Show you how to setup your R / Quarto environment so that it's ready to go when you need it
 
