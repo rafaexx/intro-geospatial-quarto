@@ -47,3 +47,21 @@
 -   Welcome to [tidyverse](https://www.tidyverse.org/) and the %\>% (i.e., pipe operator)
 
 -   Get familiar with RStudio, e.g., Help \> Cheat Sheets as well as the Help \> Keyboard Shortcuts Help
+
+## On this tutorial
+
+-   Load different data formats into spatial objects
+
+-   Skim quickly through your data
+
+-   Manipulate data's attribute table
+
+-   Spatial join two polygon shapefiles
+
+-   Merge but faster
+
+-   Rasterize but faster
+
+-   Iterate your stuff
+
+-   Manipulate NetCDF
