@@ -29,7 +29,7 @@ my_gis_lib <- "C:/Users/Rafael.Camargo/wwfgermany/FB-OuR-Daten - WRF/ws_gis/1_li
 paste0(my_gis_lib, "Wetlands/TROP-SUBTROP_WetlandV3b_2016_CIFOR.tif") 
 ```
 
-This time you download all the play data for this exercise [here](https://drive.google.com/file/d/1-yfH-WoiBJjhSDcJnvIzbT8I6QsYxnn6/view?usp=sharing)
+This time you can download all the play data for this exercise [here](https://drive.google.com/file/d/1-yfH-WoiBJjhSDcJnvIzbT8I6QsYxnn6/view?usp=sharing)
 
 ## Load different data formats into spatial objects
 
