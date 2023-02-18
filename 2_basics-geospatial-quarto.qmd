@@ -17,16 +17,16 @@ Load required packages
 
 ```{r}
 if (!require("pacman")) install.packages("pacman")
-pacman::p_load("rmarkdown", "reticulate", "tidyverse", "readxl", "sf", "stars", "rnaturalearth", "mapview", "skimr", "glue", "raster", "fasterize", "purrr")
+pacman::p_load("here", "rmarkdown", "reticulate", "tidyverse", "readxl", "sf", "stars", "rnaturalearth", "mapview", "skimr", "glue", "raster", "fasterize", "purrr")
 ```
 
 Define a shortcut to a folder that you may very often need, so later you can use shorter paths to your files
 
 ```{r}
-# be aware that R uses / (forward slashes)
-my_gis_lib <- "C:/Users/Rafael.Camargo/wwfgermany/FB-OuR-Daten - WRF/ws_gis/1_library/" 
-# that's an example
-paste0(my_gis_lib, "Wetlands/TROP-SUBTROP_WetlandV3b_2016_CIFOR.tif") 
+# be aware that R in Win reads / (forward slashes)
+my_gis_lib <- "C:/Users/Rafael.Camargo/wwfgermany/FB-OuR-Daten - WRF/ws_gis/1_library" 
+# but for now on here() will deal with paths whatever OS you use
+here(my_gis_lib, "Wetlands", "TROP-SUBTROP_WetlandV3b_2016_CIFOR.tif") 
 ```
 
 This time you can download all the play data for this exercise [here](https://drive.google.com/file/d/1-yfH-WoiBJjhSDcJnvIzbT8I6QsYxnn6/view?usp=sharing)
@@ -38,39 +38,39 @@ This time you can download all the play data for this exercise [here](https://dr
 From csv
 
 ```{r}
-ramsar <- readr::read_csv("data/ramsar_sites.csv") %>%
+ramsar <- readr::read_csv(here("data", "ramsar_sites.csv")) %>%
   sf::st_as_sf(coords = c("Longitude","Latitude"), crs = 4326, remove = FALSE)
 ```
 
 From MS Excel
 
 ```{r}
-cities <- readxl::read_excel("data/cities_over300k.xls", sheet = "Data", skip = 16) %>%
+cities <- readxl::read_excel(here("data", "cities_over300k.xls"), sheet = "Data", skip = 16) %>%
   sf::st_as_sf(coords = c("Longitude","Latitude"), crs = 4326, remove = FALSE)
 ```
 
 From shapefile
 
 ```{r}
-world_wrf <- sf::st_read("data/shp/WRF_GDP_country.shp")
+world_wrf <- sf::st_read(here("data", "shp", "WRF_GDP_country.shp"))
 ```
 
 From geodatabase
 
 ```{r}
-portugal_rbd <- sf::st_read("data/portugal.gdb", layer = "eu_river_basin_district")
+portugal_rbd <- sf::st_read(here("data", "portugal.gdb"), layer = "eu_river_basin_district")
 ```
 
 From geojson
 
 ```{r}
-portugal_adm1 <- sf::st_read("data/portugal_adm1.geojson")
+portugal_adm1 <- sf::st_read(here("data", "portugal_adm1.geojson"))
 ```
 
 From raster
 
 ```{r}
-ncp <- stars::read_stars("data/raster/avocado_Production.tif")
+ncp <- stars::read_stars(here("data", "raster", "avocado_Production.tif"))
 ```
 
 From [Natural Earth](https://cran.r-project.org/web/packages/rnaturalearth/vignettes/rnaturalearth.html)
@@ -214,7 +214,7 @@ For example, iterate with a custom function
 ```{r}
 get_top_producing_regions <- function(input, output){
   # Load crop producing regions
-  crop <- stars::read_stars(paste0("data/raster/", input))
+  crop <- stars::read_stars(here("data", "raster", input))
   crop[crop == 0] <- NA
 
   # Subset to cells of top 20% highest values
@@ -224,7 +224,7 @@ get_top_producing_regions <- function(input, output){
   # Convert raster to shapefile and write to disk
   temp <- sf::st_as_sf(crop) %>%
     sf::st_combine() %>%
-    sf::st_write(dsn = "data/shp",  output, driver = "ESRI Shapefile", delete_layer = TRUE)
+    sf::st_write(dsn = here("data", "shp"),  output, driver = "ESRI Shapefile", delete_layer = TRUE)
 } 
 ```
 
@@ -244,7 +244,7 @@ Iterate using `map`
 Visualize output
 
 ```{r}
-st_read("data/shp/avocado_top_prod.shp") %>%
+st_read(here("data", "shp", "avocado_top_prod.shp")) %>%
   mapview::mapview()
 ```
 
@@ -266,7 +266,7 @@ check_before_download <- function(destfile, url){
 Drought Index [SPEI](https://spei.csic.es/)
 
 ```{r}
-check_before_download(destfile = "data/spei48.nc",
+check_before_download(destfile = here("data", "spei48.nc"),
                       url = "https://soton.eead.csic.es/spei/10/nc/spei48.nc")
 ```
 
@@ -277,7 +277,7 @@ check_before_download(destfile = "data/spei48.nc",
 Load as a multi-layer raster object
 
 ```{r}
-spei <- raster::brick("data/spei48.nc")
+spei <- raster::brick(here("data", "spei48.nc"))
 ```
 
 Get the last 10 years of monthly observations, where Z is the variable time
