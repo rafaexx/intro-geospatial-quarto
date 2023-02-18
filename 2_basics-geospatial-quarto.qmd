@@ -104,7 +104,7 @@ cities
 See the data structure
 
 ```{r}
-str(cities)
+glimpse(cities)
 ```
 
 Skim
@@ -117,7 +117,7 @@ skimr::skim(cities)
 
 ## Manipulate data's attribute table
 
-The [sf](https://r-spatial.github.io/sf/) package as well as the [dplyr, tidyrr, stringr, forcats, and glue](https://www.tidyverse.org/packages/) are your best friend here
+The [sf](https://r-spatial.github.io/sf/) package as well as the [dplyr, tidyr, stringr, forcats, and glue](https://www.tidyverse.org/packages/) are your best friend here
 
 #### Select, relocate and/or rename fields
 
@@ -222,7 +222,7 @@ get_top_producing_regions <- function(input, output){
   crop[crop > 0] <- 1
 
   # Convert raster to shapefile and write to disk
-  temp <- sf::st_as_sf(crop) %>%
+  sf::st_as_sf(crop) %>%
     sf::st_combine() %>%
     sf::st_write(dsn = here("data", "shp"),  output, driver = "ESRI Shapefile", delete_layer = TRUE)
 } 
