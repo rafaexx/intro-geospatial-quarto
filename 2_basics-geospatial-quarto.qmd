@@ -17,7 +17,7 @@ Load required packages
 
 ```{r}
 if (!require("pacman")) install.packages("pacman")
-pacman::p_load("here", "rmarkdown", "reticulate", "tidyverse", "readxl", "sf", "stars", "rnaturalearth", "mapview", "skimr", "glue", "raster", "fasterize", "purrr")
+pacman::p_load("here", "rmarkdown", "tidyverse", "readxl", "sf", "stars", "rnaturalearth", "rnaturalearthdata", "mapview", "skimr", "glue", "raster", "fasterize", "purrr", "ncdf4")
 ```
 
 Define a shortcut to a folder that you may very often need, so later you can use shorter paths to your files
@@ -270,33 +270,46 @@ check_before_download(destfile = here("data", "spei48.nc"),
                       url = "https://soton.eead.csic.es/spei/10/nc/spei48.nc")
 ```
 
+See data info
+
+```{r}
+ncdf4::nc_open(here("data", "spei48.nc")) %>%
+  print()
+```
+
  
 
 #### Handle the data
 
-Load as a multi-layer raster object
+Load as a multi-layer stars object
 
 ```{r}
-spei <- raster::brick(here("data", "spei48.nc"))
+nc <- stars::read_ncdf(here("data", "spei48.nc"))
 ```
 
-Get the last 10 years of monthly observations, where Z is the variable time
+Slice/Get the last 10 years of monthly observations
 
 ```{r}
-spei_sliced <- spei[[which(
-  raster::getZ(spei) >= seq(Sys.Date(), length = 2, by = "-122 months")[2] & raster::getZ(spei) <= Sys.Date()
-)]]
+end <- dim(nc)[3] %>% as.numeric() # time is the dimension 3 in this data
 
-length(spei_sliced[4])
+beginning <- end - 119
+```
+
+```{r}
+nc_sliced = dplyr::slice(nc, index = beginning:end, along = "time")
 ```
 
 Compute frequency probability of severe drought events (SPEI \<= -1.5)
 
 ```{r}
-below_threshold <- function(x) dplyr::if_else(x <= -1.5, 1, 0) 
+below_threshold <- function(x) dplyr::if_else(x <= -1.5, 1, 0)
 
-drought_probability <- raster::calc(spei_sliced, fun = below_threshold) %>%
-  sum() / length(spei_sliced[4])
+n_obs <- end - beginning + 1
+freq_prob <- function(x) sum(x)/n_obs
+
+drought_probability <- nc_sliced %>%
+  stars::st_apply("time", FUN = below_threshold) %>% # applies FUN for each band (time)
+  stars::st_apply(c("lon", "lat"), FUN = freq_prob) # applies FUN across all bands (times)
 ```
 
 Visualize
