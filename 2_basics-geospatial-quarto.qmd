@@ -17,7 +17,7 @@ Load required packages
 
 ```{r}
 if (!require("pacman")) install.packages("pacman")
-pacman::p_load("here", "rmarkdown", "tidyverse", "readxl", "sf", "stars", "rnaturalearth", "rnaturalearthdata", "mapview", "skimr", "glue", "raster", "fasterize", "purrr", "ncdf4")
+pacman::p_load("rmarkdown", "tidyverse", "here", "readxl", "sf", "stars", "rnaturalearth", "rnaturalearthdata", "mapview", "skimr", "glue", "raster", "fasterize", "purrr", "ncdf4")
 ```
 
 Define a shortcut to a folder that you may very often need, so later you can use shorter paths to your files
