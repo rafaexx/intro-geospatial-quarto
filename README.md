@@ -2,7 +2,7 @@
 
 ...actually, with R but powered by Quarto
 
-[![](images/intro-geospatial-quarto-recording.png){fig-align="left" width="30%"}](https://wwf.zoom.us/rec/share/bulydgm7q6ZctGup2Ije0xiLq8RK9DJWsBLAKGotLwDfElhX6bwgwAIQ0ctxljiY.GfEa6gowS50PkjRr?startTime=1670331794000)
+[![](images/intro-geospatial-quarto-recording.png)](https://wwf.zoom.us/rec/share/bulydgm7q6ZctGup2Ije0xiLq8RK9DJWsBLAKGotLwDfElhX6bwgwAIQ0ctxljiY.GfEa6gowS50PkjRr?startTime=1670331794000)
 
 ## Why R or Quarto ?
 
